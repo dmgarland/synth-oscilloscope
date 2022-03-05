@@ -8,7 +8,7 @@ var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var chart;
 var max_sample = 101;
 
-function AmSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
+function AddSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
     this.steps = steps;
     this.overtones = overtones;
     this.seconds = seconds;
@@ -31,7 +31,7 @@ function AmSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
 }
 
 // PCM = Pulse code modulation https://en.wikipedia.org/wiki/Pulse-code_modulation
-AmSynth.prototype.fillBuffer = function(pcm_data) {
+AddSynth.prototype.fillBuffer = function(pcm_data) {
     var pulse_hz = concert_pitch_hz * Math.pow(A, this.steps);
     for(var h = 0; h < this.harmonics.length; h++) {
         var harmonic = this.harmonics[h];
@@ -45,7 +45,7 @@ AmSynth.prototype.fillBuffer = function(pcm_data) {
     }
 }
 
-AmSynth.prototype.sound = function() {
+AddSynth.prototype.sound = function() {
     // Get an AudioBufferSourceNode.
     // This is the AudioNode to use when we want to play an AudioBuffer
     var source = audioCtx.createBufferSource();
@@ -69,7 +69,7 @@ function update() {
     var harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
 
 
-    var synth = new AmSynth({ steps, overtones, seconds, sampleRate, harmonics });
+    var synth = new AddSynth({ steps, overtones, seconds, sampleRate, harmonics });
     synth.sound();
 }
 
