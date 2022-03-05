@@ -89,8 +89,7 @@ FMSynth.prototype.fillBuffer = function(pcm_data) {
 
     // FM Synth
     for (var i = 0; i < pcm_data.length; i++) {
-        var fm = Math.sin(this.phase * TAU + mod_amount * Math.sin(TAU * this.mod_phase));
-        pcm_data[i] = fm
+        pcm_data[i] = Math.sin(this.phase * TAU + mod_amount * Math.sin(TAU * this.mod_phase));
         this.phase = (this.phase + carrier_increment) % 1.0;
         this.mod_phase = (this.mod_phase + mod_increment) % 1.0;
     }
@@ -105,10 +104,19 @@ function update() {
     var mod_freq = parseInt(document.getElementById('mod_freq').value);
     var mod_amount = parseInt(document.getElementById('mod_amount').value);
     var harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
+    var synthMethod = document.querySelector('input[name="synth"]:checked').value;
+    var synth;
 
-
-    // var synth = new AddSynth({ steps, overtones, seconds, sampleRate, harmonics });
-    var synth = new FMSynth({ steps, seconds, sampleRate, mod_freq, mod_amount });
+    if(synthMethod === 'add') {
+        synth = new AddSynth({ steps, overtones, seconds, sampleRate, harmonics });
+        document.getElementById('add-fields').setAttribute("style", "display: block;");
+        document.getElementById('fm-fields').setAttribute("style", "display: none;");
+    }
+    else {
+        synth = new FMSynth({ steps, seconds, sampleRate, mod_freq, mod_amount });
+        document.getElementById('add-fields').setAttribute("style", "display: none;");
+        document.getElementById('fm-fields').setAttribute("style", "display: block;");
+    }
     synth.init();
     synth.sound();
 }

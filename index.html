@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>🎵 Intro to Snythesis: Oscilloscope</title>
         <script src="js/chart.min.js"></script>
         <style type="text/css">
           body { font-family: Arial, Helvetica Neue, Helvetica, sans-serif; }
@@ -10,23 +11,16 @@
     <body>
         <h1>Oscilloscope</h1>
         <fieldset>
+            <label for="add">Additive</label>
+            <input type="radio" id="add" name="synth" value="add" checked onchange="update()" />
+
+            <label for="fm">Frequency Modulation</label>
+            <input type="radio" id="fm" name="synth" value="fm" onchange="update()" />
+        </fieldset>
+
+        <fieldset>
             <label for="steps">Steps from concert pitch</label>
             <input type="number" id="steps" value="0" onchange="update()" />
-        </fieldset>
-
-        <fieldset>
-            <label for="overtones">Overtones</label>
-            <input type="text" id="overtones" value="1" onchange="update()" />
-        </fieldset>
-
-        <fieldset>
-            <label for="mod_freq">Modulation Frequency</label>
-            <input type="range" id="mod_freq" value="100" min="1" max="1000" onchange="update()" />
-        </fieldset>
-
-        <fieldset>
-            <label for="mod_amount">Moduation Amount</label>
-            <input type="range" id="mod_amount" value="1" min="1" max="100" onchange="update()" />
         </fieldset>
 
         <fieldset>
@@ -38,6 +32,19 @@
             <label for="sample_rate">Sample Rate (hz)</label>
             <input type="number" id="sample_rate" value="44100" onchange="update()" />
         </fieldset>
+
+        <fieldset id="add-fields">
+            <label for="overtones">Overtones</label>
+            <input type="text" id="overtones" value="1" onchange="update()" />
+        </fieldset>
+
+        <fieldset id="fm-fields" style="display: none">
+            <label for="mod_freq">Modulation Frequency</label>
+            <input type="range" id="mod_freq" value="100" min="1" max="1000" onchange="update()" />
+            <label for="mod_amount">Moduation Amount</label>
+            <input type="range" id="mod_amount" value="1" min="1" max="100" onchange="update()" />
+        </fieldset>
+
 
         <canvas id="oscilloscope" width="800" height="600"></canvas>
 
