@@ -19,7 +19,17 @@
             <input type="text" id="overtones" value="1" onchange="update()" />
         </fieldset>
 
-        <canvas id="oscilloscope" width="800" height="800"></canvas>
+        <fieldset>
+            <label for="duration">Duration (seconds)</label>
+            <input type="number" id="duration" value="1" onchange="update()" />
+        </fieldset>
+
+        <fieldset>
+            <label for="sample_rate">Sample Rate (hz)</label>
+            <input type="number" id="sample_rate" value="44100" onchange="update()" />
+        </fieldset>
+
+        <canvas id="oscilloscope" width="800" height="600"></canvas>
 
         <script src="js/synth.js"></script>
     </body>

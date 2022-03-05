@@ -1,46 +1,69 @@
-var channels = {
-    mono: 1,
-    stereo: 2
-}
+const channels = { mono: 1, stereo: 2 };
+const concert_pitch_hz = 440.0;
+const equal_temperament_steps = 12; // ET divides an octave into twelve parts
+const A = Math.pow(2, 1 / equal_temperament_steps); // Twelth root of 2 https://pages.mtu.edu/~suits/NoteFreqCalcs.html
+const TAU = Math.PI * 2; // ratio between circumfrence and radius in radians
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-var seconds = 1;
-var total_samples = audioCtx.sampleRate * seconds;
-var ref_freq = 440.0; // concert pitch 440 cycles (hertz) per second
-var A = Math.pow(2, 1 / 12); // equal temperament
-var steps = 0; // how many ET semitones away from concert pitch?
-var TAU = Math.PI * 2; // ratio between circumfrence and radius
 var chart;
-var harmonics = [];
 
-function update() {
-    steps = document.getElementById('steps').value;
-    overtones = document.getElementById('overtones').value.split(",");
-    harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
+function AmSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
+    this.steps = steps;
+    this.overtones = overtones;
+    this.seconds = seconds;
+    this.sample_rate = sampleRate;
+    this.harmonics = harmonics;
 
-    var buffer = audioCtx.createBuffer(channels.mono, total_samples, audioCtx.sampleRate);
-    for (var channel = 0; channel < buffer.numberOfChannels; channel++) {
-        fillBuffer(buffer.getChannelData(channel));
-        plotOscilloscope(buffer.getChannelData(channel).slice(0, 101));
+    audioCtx = new AudioContext({ sampleRate });
+    var total_samples = audioCtx.sampleRate * seconds;
+    this.buffer = audioCtx.createBuffer(channels.mono, total_samples, audioCtx.sampleRate);
+    for (var channel = 0; channel < this.buffer.numberOfChannels; channel++) {
+        var pcm_data = this.buffer.getChannelData(channel);
+        this.fillBuffer(pcm_data);
+        plotOscilloscope(pcm_data.slice(0, 101));
     }
-    sound(buffer);
 }
 
-
 // PCM = Pulse code modulation https://en.wikipedia.org/wiki/Pulse-code_modulation
-function fillBuffer(pcm_data) {
-    var pulse_hz = ref_freq * Math.pow(A, steps);
-    for(var h = 0; h < harmonics.length; h++) {
-        var harmonic = harmonics[h];
-
+AmSynth.prototype.fillBuffer = function(pcm_data) {
+    var pulse_hz = concert_pitch_hz * Math.pow(A, this.steps);
+    for(var h = 0; h < this.harmonics.length; h++) {
+        var harmonic = this.harmonics[h];
         var increment = (pulse_hz * harmonic.overtone) / audioCtx.sampleRate;
 
+        // Additive Synthesis
         for (var i = 0; i < pcm_data.length; i++) {
             pcm_data[i] += (Math.sin(harmonic.phase * TAU) / harmonic.overtone);
             harmonic.phase = (harmonic.phase + increment) % 1.0;
         }
     }
+}
+
+AmSynth.prototype.sound = function() {
+    // Get an AudioBufferSourceNode.
+    // This is the AudioNode to use when we want to play an AudioBuffer
+    var source = audioCtx.createBufferSource();
+
+    // set the buffer in the AudioBufferSourceNode
+    source.buffer = this.buffer;
+
+    // connect the AudioBufferSourceNode to the
+    // destination so we can hear the sound
+    source.connect(audioCtx.destination);
+
+    // start the source playing
+    source.start();
+}
+
+function update() {
+    var steps = parseInt(document.getElementById('steps').value);
+    var overtones = document.getElementById('overtones').value.split(",");
+    var seconds = parseInt(document.getElementById('duration').value);
+    var sampleRate = parseInt(document.getElementById('sample_rate').value);
+    var harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
+
+    var synth = new AmSynth({ steps, overtones, seconds, sampleRate, harmonics });
+    synth.sound();
 }
 
 function initOscilloscope() {
@@ -93,24 +116,8 @@ function plotOscilloscope(pcm_data) {
         {
             data: pcm_data
         }
-    ]
-    chart.update()
-}
-
-function sound(buffer) {
-    // Get an AudioBufferSourceNode.
-    // This is the AudioNode to use when we want to play an AudioBuffer
-    var source = audioCtx.createBufferSource();
-
-    // set the buffer in the AudioBufferSourceNode
-    source.buffer = buffer;
-
-    // connect the AudioBufferSourceNode to the
-    // destination so we can hear the sound
-    source.connect(audioCtx.destination);
-
-    // start the source playing
-    source.start();
+    ];
+    chart.update();
 }
 
 initOscilloscope();
