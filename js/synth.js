@@ -6,6 +6,7 @@ const TAU = Math.PI * 2; // ratio between circumfrence and radius in radians
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var chart;
+var max_sample = 101;
 
 function AmSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
     this.steps = steps;
@@ -14,13 +15,18 @@ function AmSynth({ steps, overtones, seconds, sampleRate, harmonics }) {
     this.sample_rate = sampleRate;
     this.harmonics = harmonics;
 
+    var prevSampleRate = audioCtx.sampleRate;
     audioCtx = new AudioContext({ sampleRate });
     var total_samples = audioCtx.sampleRate * seconds;
     this.buffer = audioCtx.createBuffer(channels.mono, total_samples, audioCtx.sampleRate);
     for (var channel = 0; channel < this.buffer.numberOfChannels; channel++) {
         var pcm_data = this.buffer.getChannelData(channel);
         this.fillBuffer(pcm_data);
-        plotOscilloscope(pcm_data.slice(0, 101));
+
+        if(prevSampleRate !== audioCtx.sampleRate) {
+            max_sample = findLastSampleInFirstPhase(pcm_data);
+        }
+        plotOscilloscope(pcm_data.slice(0, max_sample));
     }
 }
 
@@ -61,6 +67,7 @@ function update() {
     var seconds = parseInt(document.getElementById('duration').value);
     var sampleRate = parseInt(document.getElementById('sample_rate').value);
     var harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
+
 
     var synth = new AmSynth({ steps, overtones, seconds, sampleRate, harmonics });
     synth.sound();
@@ -110,7 +117,20 @@ function initOscilloscope() {
     });
 }
 
+function findLastSampleInFirstPhase(pcm_data) {
+    var negative = false;
+    for(var i = 0; i < pcm_data.length; i++) {
+        if(pcm_data[i] < 0) {
+            negative = true;
+        }
+        if(negative && pcm_data[i] > 0) {
+            return i;
+        }
+    }
+}
+
 function plotOscilloscope(pcm_data) {
+
     chart.data.labels = Array.from(pcm_data.keys());
     chart.data.datasets = [
         {
