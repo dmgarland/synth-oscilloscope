@@ -9,7 +9,8 @@
     </head>
 
     <body>
-        <h1>Oscilloscope</h1>
+        <h1>Synthesiser</h1>
+
         <fieldset>
             <label for="add">Additive</label>
             <input type="radio" id="add" name="synth" value="add" checked onchange="update()" />
@@ -36,6 +37,7 @@
         <fieldset id="add-fields">
             <label for="overtones">Overtones</label>
             <input type="text" id="overtones" value="1" onchange="update()" />
+            <span>Separate with commas to add overtones, e.g. 1,3,5</span>
         </fieldset>
 
         <fieldset id="fm-fields" style="display: none">
@@ -46,8 +48,10 @@
         </fieldset>
 
 
+        <h2>Oscilloscope</h2>
         <canvas id="oscilloscope" width="800" height="600"></canvas>
 
         <script src="js/synth.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
