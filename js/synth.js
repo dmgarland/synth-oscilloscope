@@ -37,7 +37,7 @@ function fillBuffer(pcm_data) {
         var increment = (pulse_hz * harmonic.overtone) / audioCtx.sampleRate;
 
         for (var i = 0; i < pcm_data.length; i++) {
-            pcm_data[i] += Math.sin(harmonic.phase * TAU);
+            pcm_data[i] += (Math.sin(harmonic.phase * TAU) / harmonic.overtone);
             harmonic.phase = (harmonic.phase + increment) % 1.0;
         }
     }
@@ -81,7 +81,8 @@ function initOscilloscope() {
                         text: 'Amplitude'
                     }
                 }
-            }
+            },
+            responsive: false
         }
     });
 }
