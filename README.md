@@ -1,3 +1,3 @@
 # Synth Oscilloscope
 
-[Demo](https:/dmgarland.github.io/synth-oscilloscope)
+[Demo](https://dmgarland.github.io/synth-oscilloscope)
