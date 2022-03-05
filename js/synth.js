@@ -7,34 +7,39 @@ var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 var seconds = 1;
 var total_samples = audioCtx.sampleRate * seconds;
-var myArrayBuffer = audioCtx.createBuffer(channels.mono, total_samples, audioCtx.sampleRate);
 var ref_freq = 440.0; // concert pitch 440 cycles (hertz) per second
 var A = Math.pow(2, 1 / 12); // equal temperament
 var steps = 0; // how many ET semitones away from concert pitch?
-var phase = 0.0; // How far along the wave we are?
 var TAU = Math.PI * 2; // ratio between circumfrence and radius
 var chart;
+var harmonics = [];
 
 function update() {
-    phase = 0.0
     steps = document.getElementById('steps').value;
+    overtones = document.getElementById('overtones').value.split(",");
+    harmonics = overtones.map(function(overtone) { return { overtone: parseInt(overtone), phase: 0.0 };});
 
-    for (var channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
-        fillBuffer(myArrayBuffer.getChannelData(channel));
-        plotOscilloscope(myArrayBuffer.getChannelData(channel).slice(0, 101));
+    var buffer = audioCtx.createBuffer(channels.mono, total_samples, audioCtx.sampleRate);
+    for (var channel = 0; channel < buffer.numberOfChannels; channel++) {
+        fillBuffer(buffer.getChannelData(channel));
+        plotOscilloscope(buffer.getChannelData(channel).slice(0, 101));
     }
-    sound();
+    sound(buffer);
 }
 
 
 // PCM = Pulse code modulation https://en.wikipedia.org/wiki/Pulse-code_modulation
 function fillBuffer(pcm_data) {
     var pulse_hz = ref_freq * Math.pow(A, steps);
-    var increment = pulse_hz / audioCtx.sampleRate;
+    for(var h = 0; h < harmonics.length; h++) {
+        var harmonic = harmonics[h];
 
-    for (var i = 0; i < pcm_data.length; i++) {
-        pcm_data[i] = Math.sin(phase * TAU);
-        phase = (phase + increment) % 1.0;
+        var increment = (pulse_hz * harmonic.overtone) / audioCtx.sampleRate;
+
+        for (var i = 0; i < pcm_data.length; i++) {
+            pcm_data[i] += Math.sin(harmonic.phase * TAU);
+            harmonic.phase = (harmonic.phase + increment) % 1.0;
+        }
     }
 }
 
@@ -91,13 +96,13 @@ function plotOscilloscope(pcm_data) {
     chart.update()
 }
 
-function sound() {
+function sound(buffer) {
     // Get an AudioBufferSourceNode.
     // This is the AudioNode to use when we want to play an AudioBuffer
     var source = audioCtx.createBufferSource();
 
     // set the buffer in the AudioBufferSourceNode
-    source.buffer = myArrayBuffer;
+    source.buffer = buffer;
 
     // connect the AudioBufferSourceNode to the
     // destination so we can hear the sound
