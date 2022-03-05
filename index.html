@@ -20,8 +20,18 @@
         </fieldset>
 
         <fieldset>
+            <label for="mod_freq">Modulation Frequency</label>
+            <input type="range" id="mod_freq" value="100" min="1" max="1000" onchange="update()" />
+        </fieldset>
+
+        <fieldset>
+            <label for="mod_amount">Moduation Amount</label>
+            <input type="range" id="mod_amount" value="1" min="1" max="100" onchange="update()" />
+        </fieldset>
+
+        <fieldset>
             <label for="duration">Duration (seconds)</label>
-            <input type="number" id="duration" value="1" onchange="update()" />
+            <input type="range" id="duration" value="1" min="1" max="5" onchange="update()" />
         </fieldset>
 
         <fieldset>
