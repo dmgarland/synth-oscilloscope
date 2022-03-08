@@ -1,7 +1,11 @@
 var chart;
 var max_sample = 101;
 
-function update() {
+function update(mute) {
+    var freq_hz = parseInt(document.getElementById('freq').value);
+    if(document.getElementById('series')) {
+        freq_hz = freq_hz * parseInt(document.getElementById('series').value);
+    }
     var steps = parseInt(document.getElementById('steps').value);
     var overtones = document.getElementById('overtones').value.split(",");
     var seconds = parseInt(document.getElementById('duration').value);
@@ -17,7 +21,7 @@ function update() {
     };
 
     if(synthMethod === 'add') {
-        synth = new AddSynth({ steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged });
+        synth = new AddSynth({ freq_hz, steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged });
         document.getElementById('add-fields').setAttribute("style", "display: block;");
         document.getElementById('fm-fields').setAttribute("style", "display: none;");
     }
@@ -27,8 +31,9 @@ function update() {
         document.getElementById('fm-fields').setAttribute("style", "display: block;");
     }
     synth.init();
-    synth.sound();
+
     plotOscilloscope(synth.buffer.getChannelData(0).slice(0, max_sample));
+    if(!mute) synth.sound();
 }
 
 function initOscilloscope() {
@@ -88,7 +93,6 @@ function findLastSampleInFirstPhase(pcm_data) {
 }
 
 function plotOscilloscope(pcm_data) {
-
     chart.data.labels = Array.from(pcm_data.keys());
     chart.data.datasets = [
         {
@@ -99,4 +103,4 @@ function plotOscilloscope(pcm_data) {
 }
 
 initOscilloscope();
-update();
+update(true);

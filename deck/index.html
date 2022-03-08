@@ -1,0 +1,730 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>An Introduction to Synthesis</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+    <style type="text/css">
+     .shadow {
+         background: rgba(0, 0, 0,0.4);
+     }
+     .reveal pre {
+         width: 100%;
+     }
+     .reveal pre code {
+         max-height: 100%;
+     }
+    </style>
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+          <section><h3>An Introduction to </h3><h1>Synthesis</h1></section>
+          <section>
+              <h2>What we'll cover...</h2>
+              <ul>
+                  <li class="fragment">What is Sound?</li>
+                  <li class="fragment">Where Math meets Music</li>
+                  <li class="fragment">How to model sound in code</li>
+                  <li class="fragment">Synthesis techniques</li>
+              </ul>
+          </section>
+          <section>
+              <h2>What is Sound?</h2>
+              <ul>
+                  <li class="fragment">Longitudinal wave</li>
+                  <li class="fragment">Travelling at 343 m/s in air</li>
+                  <li class="fragment">Produced by vibration</li>
+              </ul>
+          </section>
+          <section data-background-iframe="https://www.youtube.com/embed/zssXukkKoWM?start=21">           </section>
+          <section data-transition="slide none"><img src="images/sin.png" alt="Sin wave" /></section>
+          <section data-transition="slide none"><img src="images/sin-2.png" alt="Amplitude is loudness" /></section>
+          <section data-transition="slide none"><img src="images/sin-3.png" alt="Wavelength is pitch" /></section>
+          <section><h2>Sound is Vibration</h2>
+              <ul>
+                  <li class="fragment">cycles per second = Frequency</li>
+                  <li class="fragment">Measured in Hertz (hz)</li>
+                  <li class="fragment">We can hear 20hz-20,000hz</li>
+              </ul>
+          </section>
+          <section data-background-image="images/whales.jpg"><h2>Whale song <span class="fragment"> = 10-40hz</span></h2></section>
+          <section data-background-image="images/m1.jpg"><h2 class="shadow">Apple M1 CPU Clock<span class="fragment"> = 3,200,000,000hz</span></h2></section>
+          <section  data-background-image="images/hydrogen.jpg"><h2 class="shadow">Hydrogen <span class="fragment">= 3,287,870,000,000,000hz</h2></section>
+              <section data-background-image="images/orchestra.jpeg"><h2 class="shadow">Concert pitch <span class="fragment">= 440 hz</span></h2></section>
+              <section><h1>A<span class="fragment">4</span></h1>
+                  <ul>
+                      <li class="fragment">When 440 78.41cm longitudinal waves travelling at 770 miles an hour hit your eardrums every second, you perceive a note called A4</li>
+                  </ul>
+              </section>
+              <section>
+                  <iframe width="100%" height="800" src="../pitch.html"></iframe>
+              </section>
+              <section>
+                  <section>
+                      <h3>Example: C2 (65.4hz)</h3>
+                      <table>
+                          <thead>
+                          <tr>
+                              <th>Overtone</th>
+                              <th>Frequency (hz)</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr>
+                              <th>1</th>
+                              <th>65.40</th>
+                          </tr>
+                          <tr>
+                              <th>2</th>
+                              <th>130.8</th>
+                          </tr>
+                          <tr>
+                              <th>3</th>
+                              <th>196.2</th>
+                          </tr>
+                          <tr>
+                              <th>4</th>
+                              <th>261.6</th>
+                          </tr>
+                          <tr>
+                              <th>5</th>
+                              <th>327.0</th>
+                          </tr>
+                          <tr>
+                              <th>6</th>
+                              <th>392.4</th>
+                          </tr>
+                          <tr>
+                              <th>7</th>
+                              <th>457.8</th>
+                          </tr>
+                          <tr>
+                              <th>8</th>
+                              <th>523.2</th>
+                          </tr>
+                          </tbody>
+                      </table>
+                  </section>
+                  <section>
+                      <h3>Example: C2 (65.4hz)</h3>
+                      <table>
+                          <thead>
+                              <tr>
+                                  <th>Overtone</th>
+                                  <th>Frequency (hz)</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          <tr>
+                              <th>9</th>
+                              <th>588.7</th>
+                          </tr>
+                          <tr>
+                              <th>10</th>
+                              <th>654.1</th>
+                          </tr>
+                          <tr>
+                              <th>11</th>
+                              <th>719.5</th>
+                          </tr>
+                          <tr>
+                              <th>12</th>
+                              <th>784.9</th>
+                          </tr>
+                          <tr>
+                              <th>13</th>
+                              <th>850.3</th>
+                          </tr>
+                          <tr>
+                              <th>14</th>
+                              <th>915.7</th>
+                          </tr>
+                          <tr>
+                              <th>15</th>
+                              <th>981.1</th>
+                          </tr>
+                          <tr>
+                              <th>16</th>
+                              <th>1046.5</th>
+                          </tr>
+                          </tbody>
+                      </table>
+                  </section>
+                          </tbody>
+                      </table>
+                  </ul>
+              </section>
+              <section data-background-color="white">
+                  <img src="images/overtones.png" alt="Overtones" />
+                  <ul style="color: black">
+                      <li class="fragment">Bb, F# and A# are... wrong...</li>
+                      <li class="fragment">Breaks if we modulate to another key!</li>
+                  </ul>
+              </section>
+              <section>
+                  <h2>Equal Temperament</h2>
+                  <ul>
+                    <li class="fragment">Divide the octave into 12 equal steps</li>
+                    <li class="fragment">Developed to play any key equally well</li>
+                  </ul>
+              </section>
+              <section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+<tr><td align="center">C<sub>0</sub></td><td align="center">       16.35</td>
+<td align="center">     2109.89</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>0</sub>/D<sup>b</sup><sub>0</sub>&nbsp;</td>
+<td align="center">       17.32</td>
+<td align="center">     1991.47</td></tr>
+ <tr><td align="center">D<sub>0</sub></td><td align="center">       18.35</td>
+<td align="center">     1879.69</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>0</sub>/E<sup>b</sup><sub>0</sub>&nbsp;</td>
+<td align="center">       19.45</td>
+<td align="center">     1774.20</td></tr>
+ <tr><td align="center">E<sub>0</sub></td><td align="center">       20.60</td>
+<td align="center">     1674.62</td></tr>
+ <tr><td align="center">F<sub>0</sub></td><td align="center">       21.83</td>
+<td align="center">     1580.63</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>0</sub>/G<sup>b</sup><sub>0</sub>&nbsp;</td>
+<td align="center">       23.12</td>
+<td align="center">     1491.91</td></tr>
+ <tr><td align="center">G<sub>0</sub></td><td align="center">       24.50</td>
+<td align="center">     1408.18</td></tr>
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>0</sub>/A<sup>b</sup><sub>0</sub>&nbsp;</td>
+<td align="center">       25.96</td>
+<td align="center">     1329.14</td></tr>
+ <tr><td align="center">A<sub>0</sub></td><td align="center">       27.50</td>
+<td align="center">     1254.55</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>0</sub>/B<sup>b</sup><sub>0</sub>&nbsp;</td>
+<td align="center">       29.14</td>
+<td align="center">     1184.13</td></tr>
+ <tr><td align="center">B<sub>0</sub></td><td align="center">       30.87</td>
+<td align="center">     1117.67</td></tr>
+ <tr><td align="center">C<sub>1</sub></td><td align="center">       32.70</td>
+<td align="center">     1054.94</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>1</sub>/D<sup>b</sup><sub>1</sub>&nbsp;</td>
+<td align="center">       34.65</td>
+<td align="center">      995.73</td></tr>
+ <tr><td align="center">D<sub>1</sub></td><td align="center">       36.71</td>
+<td align="center">      939.85</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>1</sub>/E<sup>b</sup><sub>1</sub>&nbsp;</td>
+<td align="center">       38.89</td>
+<td align="center">      887.10</td></tr>
+
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+
+
+ <tr><td align="center">E<sub>1</sub></td><td align="center">       41.20</td>
+<td align="center">      837.31</td></tr>
+ <tr><td align="center">F<sub>1</sub></td><td align="center">       43.65</td>
+<td align="center">      790.31</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>1</sub>/G<sup>b</sup><sub>1</sub>&nbsp;</td>
+<td align="center">       46.25</td>
+<td align="center">      745.96</td></tr>
+ <tr><td align="center">G<sub>1</sub></td><td align="center">       49.00</td>
+<td align="center">      704.09</td></tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>1</sub>/A<sup>b</sup><sub>1</sub>&nbsp;</td>
+<td align="center">       51.91</td>
+<td align="center">      664.57</td></tr>
+ <tr><td align="center">A<sub>1</sub></td><td align="center">       55.00</td>
+<td align="center">      627.27</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>1</sub>/B<sup>b</sup><sub>1</sub>&nbsp;</td>
+<td align="center">       58.27</td>
+<td align="center">      592.07</td></tr>
+ <tr><td align="center">B<sub>1</sub></td><td align="center">       61.74</td>
+<td align="center">      558.84</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">C<sub>2</sub></td><td align="center">       65.41</td>
+<td align="center">      527.47</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>2</sub>/D<sup>b</sup><sub>2</sub>&nbsp;</td>
+<td align="center">       69.30</td>
+<td align="center">      497.87</td></tr>
+ <tr><td align="center">D<sub>2</sub></td><td align="center">       73.42</td>
+<td align="center">      469.92</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>2</sub>/E<sup>b</sup><sub>2</sub>&nbsp;</td>
+<td align="center">       77.78</td>
+<td align="center">      443.55</td></tr>
+ <tr><td align="center">E<sub>2</sub></td><td align="center">       82.41</td>
+<td align="center">      418.65</td></tr>
+ <tr><td align="center">F<sub>2</sub></td><td align="center">       87.31</td>
+<td align="center">      395.16</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>2</sub>/G<sup>b</sup><sub>2</sub>&nbsp;</td>
+<td align="center">       92.50</td>
+<td align="center">      372.98</td></tr>
+ <tr><td align="center">G<sub>2</sub></td><td align="center">       98.00</td>
+<td align="center">      352.04</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>2</sub>/A<sup>b</sup><sub>2</sub>&nbsp;</td>
+<td align="center">      103.83</td>
+<td align="center">      332.29</td></tr>
+ <tr><td align="center">A<sub>2</sub></td><td align="center">      110.00</td>
+<td align="center">      313.64</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>2</sub>/B<sup>b</sup><sub>2</sub>&nbsp;</td>
+<td align="center">      116.54</td>
+<td align="center">      296.03</td></tr>
+ <tr><td align="center">B<sub>2</sub></td><td align="center">      123.47</td>
+<td align="center">      279.42</td></tr>
+ <tr><td align="center">C<sub>3</sub></td><td align="center">      130.81</td>
+<td align="center">      263.74</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>3</sub>/D<sup>b</sup><sub>3</sub>&nbsp;</td>
+<td align="center">      138.59</td>
+<td align="center">      248.93</td></tr>
+ <tr><td align="center">D<sub>3</sub></td><td align="center">      146.83</td>
+<td align="center">      234.96</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>3</sub>/E<sup>b</sup><sub>3</sub>&nbsp;</td>
+<td align="center">      155.56</td>
+<td align="center">      221.77</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">E<sub>3</sub></td><td align="center">      164.81</td>
+<td align="center">      209.33</td></tr>
+ <tr><td align="center">F<sub>3</sub></td><td align="center">      174.61</td>
+<td align="center">      197.58</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>3</sub>/G<sup>b</sup><sub>3</sub>&nbsp;</td>
+<td align="center">      185.00</td>
+<td align="center">      186.49</td></tr>
+ <tr><td align="center">G<sub>3</sub></td><td align="center">      196.00</td>
+<td align="center">      176.02</td></tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>3</sub>/A<sup>b</sup><sub>3</sub>&nbsp;</td>
+<td align="center">      207.65</td>
+<td align="center">      166.14</td></tr>
+ <tr><td align="center">A<sub>3</sub></td><td align="center">      220.00</td>
+<td align="center">      156.82</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>3</sub>/B<sup>b</sup><sub>3</sub>&nbsp;</td>
+<td align="center">      233.08</td>
+<td align="center">      148.02</td></tr>
+ <tr><td align="center">B<sub>3</sub></td><td align="center">      246.94</td>
+<td align="center">      139.71</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">C<sub>4</sub></td><td align="center">      261.63</td>
+<td align="center">      131.87</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>4</sub>/D<sup>b</sup><sub>4</sub>&nbsp;</td>
+<td align="center">      277.18</td>
+<td align="center">      124.47</td></tr>
+ <tr><td align="center">D<sub>4</sub></td><td align="center">      293.66</td>
+<td align="center">      117.48</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>4</sub>/E<sup>b</sup><sub>4</sub>&nbsp;</td>
+<td align="center">      311.13</td>
+<td align="center">      110.89</td></tr>
+ <tr><td align="center">E<sub>4</sub></td><td align="center">      329.63</td>
+<td align="center">      104.66</td></tr>
+ <tr><td align="center">F<sub>4</sub></td><td align="center">      349.23</td>
+<td align="center">       98.79</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>4</sub>/G<sup>b</sup><sub>4</sub>&nbsp;</td>
+<td align="center">      369.99</td>
+<td align="center">       93.24</td></tr>
+ <tr><td align="center">G<sub>4</sub></td><td align="center">      392.00</td>
+<td align="center">       88.01</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>4</sub>/A<sup>b</sup><sub>4</sub>&nbsp;</td>
+<td align="center">      415.30</td>
+<td align="center">       83.07</td></tr>
+ <tr><td align="center">A<sub>4</sub></td><td align="center">      440.00</td>
+<td align="center">       78.41</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>4</sub>/B<sup>b</sup><sub>4</sub>&nbsp;</td>
+<td align="center">      466.16</td>
+<td align="center">       74.01</td></tr>
+ <tr><td align="center">B<sub>4</sub></td><td align="center">      493.88</td>
+<td align="center">       69.85</td></tr>
+ <tr><td align="center">C<sub>5</sub></td><td align="center">      523.25</td>
+<td align="center">       65.93</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>5</sub>/D<sup>b</sup><sub>5</sub>&nbsp;</td>
+<td align="center">      554.37</td>
+<td align="center">       62.23</td></tr>
+ <tr><td align="center">D<sub>5</sub></td><td align="center">      587.33</td>
+<td align="center">       58.74</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>5</sub>/E<sup>b</sup><sub>5</sub>&nbsp;</td>
+<td align="center">      622.25</td>
+<td align="center">       55.44</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">E<sub>5</sub></td><td align="center">      659.25</td>
+<td align="center">       52.33</td></tr>
+ <tr><td align="center">F<sub>5</sub></td><td align="center">      698.46</td>
+<td align="center">       49.39</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>5</sub>/G<sup>b</sup><sub>5</sub>&nbsp;</td>
+<td align="center">      739.99</td>
+<td align="center">       46.62</td></tr>
+ <tr><td align="center">G<sub>5</sub></td><td align="center">      783.99</td>
+<td align="center">       44.01</td></tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>5</sub>/A<sup>b</sup><sub>5</sub>&nbsp;</td>
+<td align="center">      830.61</td>
+<td align="center">       41.54</td></tr>
+ <tr><td align="center">A<sub>5</sub></td><td align="center">      880.00</td>
+<td align="center">       39.20</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>5</sub>/B<sup>b</sup><sub>5</sub>&nbsp;</td>
+<td align="center">      932.33</td>
+<td align="center">       37.00</td></tr>
+ <tr><td align="center">B<sub>5</sub></td><td align="center">      987.77</td>
+<td align="center">       34.93</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">C<sub>6</sub></td><td align="center">     1046.50</td>
+<td align="center">       32.97</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>6</sub>/D<sup>b</sup><sub>6</sub>&nbsp;</td>
+<td align="center">     1108.73</td>
+<td align="center">       31.12</td></tr>
+ <tr><td align="center">D<sub>6</sub></td><td align="center">     1174.66</td>
+<td align="center">       29.37</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>6</sub>/E<sup>b</sup><sub>6</sub>&nbsp;</td>
+<td align="center">     1244.51</td>
+<td align="center">       27.72</td></tr>
+ <tr><td align="center">E<sub>6</sub></td><td align="center">     1318.51</td>
+<td align="center">       26.17</td></tr>
+ <tr><td align="center">F<sub>6</sub></td><td align="center">     1396.91</td>
+<td align="center">       24.70</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>6</sub>/G<sup>b</sup><sub>6</sub>&nbsp;</td>
+<td align="center">     1479.98</td>
+<td align="center">       23.31</td></tr>
+ <tr><td align="center">G<sub>6</sub></td><td align="center">     1567.98</td>
+<td align="center">       22.00</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>6</sub>/A<sup>b</sup><sub>6</sub>&nbsp;</td>
+<td align="center">     1661.22</td>
+<td align="center">       20.77</td></tr>
+ <tr><td align="center">A<sub>6</sub></td><td align="center">     1760.00</td>
+<td align="center">       19.60</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>6</sub>/B<sup>b</sup><sub>6</sub>&nbsp;</td>
+<td align="center">     1864.66</td>
+<td align="center">       18.50</td></tr>
+ <tr><td align="center">B<sub>6</sub></td><td align="center">     1975.53</td>
+<td align="center">       17.46</td></tr>
+ <tr><td align="center">C<sub>7</sub></td><td align="center">     2093.00</td>
+<td align="center">       16.48</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>7</sub>/D<sup>b</sup><sub>7</sub>&nbsp;</td>
+<td align="center">     2217.46</td>
+<td align="center">       15.56</td></tr>
+ <tr><td align="center">D<sub>7</sub></td><td align="center">     2349.32</td>
+<td align="center">       14.69</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>7</sub>/E<sup>b</sup><sub>7</sub>&nbsp;</td>
+<td align="center">     2489.02</td>
+<td align="center">       13.86</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">E<sub>7</sub></td><td align="center">     2637.02</td>
+<td align="center">       13.08</td></tr>
+ <tr><td align="center">F<sub>7</sub></td><td align="center">     2793.83</td>
+<td align="center">       12.35</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>7</sub>/G<sup>b</sup><sub>7</sub>&nbsp;</td>
+<td align="center">     2959.96</td>
+<td align="center">       11.66</td></tr>
+ <tr><td align="center">G<sub>7</sub></td><td align="center">     3135.96</td>
+<td align="center">       11.00</td></tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>7</sub>/A<sup>b</sup><sub>7</sub>&nbsp;</td>
+<td align="center">     3322.44</td>
+<td align="center">       10.38</td></tr>
+ <tr><td align="center">A<sub>7</sub></td><td align="center">     3520.00</td>
+<td align="center">        9.80</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>7</sub>/B<sup>b</sup><sub>7</sub>&nbsp;</td>
+<td align="center">     3729.31</td>
+<td align="center">        9.25</td></tr>
+ <tr><td align="center">B<sub>7</sub></td><td align="center">     3951.07</td>
+<td align="center">        8.73</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">C<sub>8</sub></td><td align="center">     4186.01</td>
+<td align="center">        8.24</td></tr>
+ <tr><td align="center">&nbsp;C<sup>#</sup><sub>8</sub>/D<sup>b</sup><sub>8</sub>&nbsp;</td>
+<td align="center">     4434.92</td>
+<td align="center">        7.78</td></tr>
+ <tr><td align="center">D<sub>8</sub></td><td align="center">     4698.63</td>
+<td align="center">        7.34</td></tr>
+ <tr><td align="center">&nbsp;D<sup>#</sup><sub>8</sub>/E<sup>b</sup><sub>8</sub>&nbsp;</td>
+<td align="center">     4978.03</td>
+<td align="center">        6.93</td></tr>
+ <tr><td align="center">E<sub>8</sub></td><td align="center">     5274.04</td>
+<td align="center">        6.54</td></tr>
+ <tr><td align="center">F<sub>8</sub></td><td align="center">     5587.65</td>
+<td align="center">        6.17</td></tr>
+ <tr><td align="center">&nbsp;F<sup>#</sup><sub>8</sub>/G<sup>b</sup><sub>8</sub>&nbsp;</td>
+<td align="center">     5919.91</td>
+<td align="center">        5.83</td></tr>
+ <tr><td align="center">G<sub>8</sub></td><td align="center">     6271.93</td>
+<td align="center">        5.50</td></tr>
+
+                          </tbody></table>
+                  </section>
+                  <section>
+                      <table border="">
+                          <tbody><tr><th>Note</th><th>Frequency (Hz)</th><th>Wavelength (cm)</th> </tr>
+ <tr><td align="center">&nbsp;G<sup>#</sup><sub>8</sub>/A<sup>b</sup><sub>8</sub>&nbsp;</td>
+<td align="center">     6644.88</td>
+<td align="center">        5.19</td></tr>
+ <tr><td align="center">A<sub>8</sub></td><td align="center">     7040.00</td>
+<td align="center">        4.90</td></tr>
+ <tr><td align="center">&nbsp;A<sup>#</sup><sub>8</sub>/B<sup>b</sup><sub>8</sub>&nbsp;</td>
+<td align="center">     7458.62</td>
+<td align="center">        4.63</td></tr>
+ <tr><td align="center">B<sub>8</sub></td><td align="center">     7902.13</td>
+<td align="center">        4.37</td></tr>
+</tbody></table>
+              </section>
+              </section>
+              <section><h2>Calculating frequency</h2>
+                  \[\begin{aligned}
+                  f_n = f_0 \cdot a^n \\
+                  \end{aligned} \]
+                  <pre><code>
+// Constants
+const concert_pitch_hz = 440.0;
+const equal_temperament_steps = 12;
+const A = Math.pow(2, 1 / equal_temperament_steps);
+
+function frequency(steps) {
+  return concert_pitch_hz * Math.pow(A, steps)
+}
+                  </code></pre>
+              </section>
+              <section><h2>Modelling Sound in Code</h2></section>
+              <section><h3>Sampling</h3>
+                  <ul>
+                      <li class="fragment">Converting analog to digital</li>
+                      <li class="fragment">How to model an infinite series of points?</li>
+                      <li class="fragment">Array of amplitude values</li>
+                      <li class="fragment">Pulse Code Modulation</li>
+                      <li class="fragment">Tradeoff: quality vs. size</li>
+                  </ul>
+                      <div class="fragment">
+                      <pre><code class="language-javascript">
+var amplitudes = [];
+for(n of [0, 0.5, 1, 1.5, 2]) {
+  amplitudes.push(Math.sin(n * Math.PI))
+}
+                      </code></pre>
+                      </div>
+              </section>
+              <section>
+
+                  <h3>4 samples</h3>
+                  <img src="images/saw.png" alt="Saw wave" />
+              </section>
+
+              <section data-transition="slide none">
+                  <h3>8000 samples</h3>
+                 <img src="images/low-sample.png" alt="Sin wave sampled at 8000" />
+              </section>
+
+              <section data-transition="slide none">
+                  <h3>44100 samples</h3>
+                  <img src="images/sin.png" alt="Sin wave sampled at 44100" />
+              </section>
+
+              <section>
+                  <h3>Pulse Code Modulation</h3>
+                  <pre><code class="langauge-javascript">
+    var freq_hz = 440; // A4
+    var sample_rate = 44100; // CD Quality
+    var increment = freq_hz / sample_rate;
+    var phase = 0.0;
+    var pcm_data = [];
+
+    // Fill a 1 second buffer
+    for (var i = 0; i < sample_rate; i++) {
+       pcm_data[i] = Math.sin(phase * TAU);
+       phase = (phase + increment) % 1.0;
+    }</code></pre>
+              </section>
+              <section>
+                  <h3>WebAudio API</h3>
+                  <pre><code class="language-javascript">
+    var audioCtx = window.AudioContext;
+    // This is the AudioNode to use 
+    var source = audioCtx.createBufferSource();
+
+    // create a 1 second PCM audio buffer at 44100hz
+    source.buffer = audioCtx.createBuffer(1, 44100, 41000);
+    var pcm_data = source.buffer.getChannelData(0);
+    fillBuffer(pcm_data)
+
+    // connect the AudioBufferSourceNode to the
+    // destination so we can hear the sound
+    source.connect(audioCtx.destination);
+
+    // start the source playing
+    source.start();
+
+                  </code></pre>
+              </section>
+
+              <section data-background-image="images/synth.jpg">
+                  <h2 class="shadow">Synthesis</h2>
+              </section>
+
+              <section>
+                  <h3>Synthesis</h3>
+                  <ul>
+                      <li class="fragment">We want to make other sounds!</li>
+                      <li class="fragment">Synthesis = taking multiple things to synthesise something else</li>
+                      <li class="fragment">Additive</li>
+                      <li class="fragment">Frequency Modulation</li>
+                      <li class="fragment">Pulse modulation, Subtractive...</li>
+                  </ul>
+              </section>
+
+              <section><h3>Additive synthesis</h3>
+                  <ul>
+                      <li class="fragment">Fourier: an infinite number of waves can be made by mixing pure sine waves</li>
+                      <li class="fragment">Any sound can be analysed and sorted out into component sine waves</li>
+                      <li class="fragment">Add up the amplitude of mutliple sine waves</li>
+                      <li class="fragment">Will get louder!</li>
+                  </ul>
+              </section>
+
+              <section data-transition="none">
+                  <img src="images/sin.png" alt="Normal sin wave" />
+              </section>
+
+              <section data-transition="none">
+                  <img src="images/additive.png" alt="Normal sin wave plus 3rd overtone" />
+              </section>
+
+              <section data-transition="none">
+                  <img src="images/1-3-overtone.png" alt="Combined 1-3 overtones" />
+
+                  <small>The square wave is the fundamental and its uneven harmonics (1,3,5..)</small>
+
+              </section>
+
+              <section>
+                  <h3>Additive Synthesis</h3>
+                  <pre><code class="language-javascript">
+var harmonics = [
+  { overtone: 1, phase: 0.0},
+  { overtone: 3, phase: 0.0},
+  { overtone: 5, phase: 0.0},
+];
+
+for(var h = 0; h < harmonics.length; h++) {
+  var harmonic = harmonics[h];
+  var increment = (freq_hz * harmonic.overtone) / sample_rate;
+
+  // Additive Synthesis
+  for (var i = 0; i < pcm_data.length; i++) {
+    pcm_data[i] += (Math.sin(harmonic.phase * TAU) / harmonic.overtone);
+    harmonic.phase = (harmonic.phase + increment) % 1.0;
+  }
+}
+
+                  </code></pre>
+              </section>
+              <section>
+                  <h3>Frequency Modulation (FM)</h3>
+                  <ul>
+                      <li class="fragment">Chowning discovered that the FM technique of carrying sound for radio stations could be applied to synthesis</li>
+                      <li class="fragment">Use one sine wave (modulator) to modulate another (carrier)</li>
+                      <li class="fragment">Modulator rapidly increases/descreases the frequency</li>
+                      <li class="fragment">Adds vibrato</li>
+                      <li class="fragment">Eventually changes timbre - Sidebands</li>
+                  </ul>
+              </section>
+              <section>
+                  <h3>Frequency Modulation</h3>
+                  \[\begin{aligned}
+                  y(t) = \sin(2 \Pi f_c(t) + I \sin(2 \Pi f_m(t)) \\
+                  \end{aligned} \]
+              </section>
+              <section>
+                  <h3>Frequency Modulation</h3>
+                  <pre><code class="language-javascript">
+var carrier_increment = pulse_hz / sample_rate;
+var carrier_phase = 0.0;
+var mod_increment = mod_freq / sample_rate;
+var mod_phase = 0.0;
+var mod_amount = 1;
+
+// FM Synth
+for (var i = 0; i < pcm_data.length; i++) {
+  pcm_data[i] = Math.sin(phase * TAU + mod_amount * Math.sin(TAU * mod_phase));
+  phase = (phase + carrier_increment) % 1.0;
+  mod_phase = (mod_phase + mod_increment) % 1.0;
+}
+
+                  </code></pre>
+              </section>
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ]
+      });
+    </script>
+  </body>
+</html>

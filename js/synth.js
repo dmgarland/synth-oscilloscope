@@ -6,7 +6,8 @@ const TAU = Math.PI * 2; // ratio between circumfrence and radius in radians
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function Synth({ steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged }) {
+function Synth({ freq_hz, steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged }) {
+    this.freq_hz = freq_hz;
     this.steps = steps;
     this.overtones = overtones;
     this.seconds = seconds;
@@ -44,20 +45,18 @@ Synth.prototype.sound = function() {
     source.start();
 }
 
-
-
-function AddSynth({ steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged }) {
-    Synth.call(this, { steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged });
+function AddSynth({ freq_hz, steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged }) {
+    Synth.call(this, { freq_hz, steps, overtones, seconds, sampleRate, harmonics, sampleRateChanged });
 }
 
 AddSynth.prototype = new Synth({});
 
 // PCM = Pulse code modulation https://en.wikipedia.org/wiki/Pulse-code_modulation
 AddSynth.prototype.fillBuffer = function(pcm_data) {
-    var pulse_hz = concert_pitch_hz * Math.pow(A, this.steps);
+    if(!this.freq_hz) this.freq_hz = concert_pitch_hz * Math.pow(A, this.steps);
     for(var h = 0; h < this.harmonics.length; h++) {
         var harmonic = this.harmonics[h];
-        var increment = (pulse_hz * harmonic.overtone) / audioCtx.sampleRate;
+        var increment = (this.freq_hz * harmonic.overtone) / audioCtx.sampleRate;
 
         // Additive Synthesis
         for (var i = 0; i < pcm_data.length; i++) {
@@ -78,14 +77,12 @@ function FMSynth({ steps, overtones, seconds, sampleRate, mod_freq, mod_amount, 
 FMSynth.prototype = new Synth({});
 FMSynth.prototype.fillBuffer = function(pcm_data) {
     var pulse_hz = concert_pitch_hz * Math.pow(A, this.steps);
-    var mod_hz = this.mod_freq;
-    var mod_amount = this.mod_amount;
     var carrier_increment = pulse_hz / this.sample_rate;
-    var mod_increment = mod_hz / this.sample_rate;
+    var mod_increment = this.mod_freq / this.sample_rate;
 
     // FM Synth
     for (var i = 0; i < pcm_data.length; i++) {
-        pcm_data[i] = Math.sin(this.phase * TAU + mod_amount * Math.sin(TAU * this.mod_phase));
+        pcm_data[i] = Math.sin(this.phase * TAU + this.mod_amount * Math.sin(TAU * this.mod_phase));
         this.phase = (this.phase + carrier_increment) % 1.0;
         this.mod_phase = (this.mod_phase + mod_increment) % 1.0;
     }

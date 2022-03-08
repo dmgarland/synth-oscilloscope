@@ -9,9 +9,7 @@
     </head>
 
     <body>
-        <h1>Synthesiser</h1>
-
-        <fieldset>
+        <fieldset style="display: none">
             <label for="add">Additive</label>
             <input type="radio" id="add" name="synth" value="add" checked onchange="update()" />
 
@@ -19,14 +17,17 @@
             <input type="radio" id="fm" name="synth" value="fm" onchange="update()" />
         </fieldset>
 
-        <fieldset>
-            <label for="steps">Steps from concert pitch</label>
-            <input type="number" id="steps" value="0" onchange="update()" />
-
+        <fieldset style="color: white">
+            <input type="hidden" id="steps" />
             <label for="freq">Frequency (hz)</label>
             <input type="number" id="freq" value="440" onchange="update()" />
+
+            <label for="series">Harmonic Series</label>
+            <input type="number" id="series" value="1" onchange="update()" />
+            <input type="submit" onclick="update()" value="play" />
         </fieldset>
 
+        <div style="display: none;">
         <fieldset>
             <label for="duration">Duration (seconds)</label>
             <input type="range" id="duration" value="1" min="1" max="5" onchange="update()" />
@@ -49,10 +50,9 @@
             <label for="mod_amount">Moduation Amount</label>
             <input type="range" id="mod_amount" value="1" min="1" max="100" onchange="update()" />
         </fieldset>
+        </div>
 
-
-        <h2>Oscilloscope</h2>
-        <canvas id="oscilloscope" width="800" height="600"></canvas>
+        <canvas id="oscilloscope" width="800" height="600" style="margin-top: 1em"></canvas>
 
         <script src="js/synth.js"></script>
         <script src="js/main.js"></script>
